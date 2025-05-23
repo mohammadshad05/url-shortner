@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="glass-card">
+      <h1>✨URL Shortener</h1>
+      <form id="urlForm">
+        <input type="text" id="longUrl" placeholder="Paste your long URL..." required />
+        <button type="submit">Generate Short URL</button>
+      </form>
+      <div id="result" class="hidden">
+        <p>Your short URL:</p>
+        <div class="short-url-box">
+          <a id="shortLink" href="#" target="_blank"></a>
+          <button id="copyBtn">📋 Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const resultBox = document.getElementById('result');
+    const shortLink = document.getElementById('shortLink');
+    const copyBtn = document.getElementById('copyBtn');
+
+    document.getElementById('urlForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const longUrl = document.getElementById('longUrl').value;
+      const response = await fetch('/shorten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ longUrl })
+      });
+
+      const data = await response.json();
+      shortLink.href = data.shortUrl;
+      shortLink.textContent = data.shortUrl;
+      resultBox.classList.remove('hidden');
+    });
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(shortLink.textContent);
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = '📋 Copy';
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
